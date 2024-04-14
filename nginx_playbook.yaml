@@ -1,0 +1,54 @@
+---
+- name: Install and Configure Nginx on CentOS 7
+  hosts: user1  # Specify the group of hosts where this playbook will run (you can adjust this)
+  become: yes  # Run tasks with elevated privileges (sudo)
+
+  tasks:
+    - name: Install epel repo 
+      yum:
+        name: epel-release
+        state: present
+      tags: install_epel 
+
+    - name: install nginx
+      yum:
+        name: nginx
+        state: latest 
+      tags: install_nginx
+    - name: enable nginx
+      service:
+        name: nginx
+        enabled: true
+        state: started
+
+    - name: Copy index
+      copy:
+        src: ./nginx.conf  # copy conf file 
+        dest: /usr/share/nginx/.
+      notify: Restart Nginx  # Trigger the handler to restart Nginx
+      tags: copy_nginx
+
+
+    - name: Configure index
+      template:
+        src: ./index.html.j2  # Use Jinja2 template for configuration of index.html
+        dest: /usr/share/nginx/html/index.html
+      notify: Restart Nginx  # Trigger the handler to restart Nginx
+      tags: configure_nginx
+
+    - name: Start Nginx service
+      service:
+        name: nginx
+        state: started
+      tags: start_nginx
+    - name: Wait for Nginx to start listening on port 80
+      wait_for:
+        host: localhost
+        port: 80
+        timeout: 10
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+

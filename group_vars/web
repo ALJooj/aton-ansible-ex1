@@ -1,0 +1,5 @@
+---
+ansible_ssh_private_key_file  : /home/centos/.ssh/CentOS-STD2-1-1-20GB-IC0nO1uJ.pem     
+ansible_user                  : centos 
+my_fio                        : "Maxim Kirshin Anatolievich" 
+organization                  : "ATON"
